@@ -72,7 +72,7 @@ android {
     defaultConfig {
         applicationId project.APP_ID
         minSdkVersion Math.max(flutter.minSdkVersion, 26)
-        targetSdkVersion 34  // Update this
+        targetSdkVersion 34 
         versionCode project.VERSION_CODE
         versionName project.VERSION_NAME
         multiDexEnabled true
