@@ -296,4 +296,7 @@ class StringConstants {
   /// Title displayed above the daily quote widget in the home view
   static const String dailyQuote = 'Daily Quote';
 
+  static const termsOfService = 'Terms of Service';
+  static const privacyPolicy = 'Privacy Policy';
+
 }

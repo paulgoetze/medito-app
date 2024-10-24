@@ -8,6 +8,7 @@ class EnvConfig {
   final String sentryDsn;
   final String supabaseKey;
   final String supabaseUrl;
+  final String editStatsUrl;
 
   const EnvConfig({
     required this.environment,
@@ -17,6 +18,7 @@ class EnvConfig {
     required this.sentryDsn,
     required this.supabaseKey,
     required this.supabaseUrl,
+    required this.editStatsUrl,
   });
 }
 
@@ -29,6 +31,7 @@ class ProdEnv extends EnvConfig {
     required super.sentryDsn,
     required super.supabaseKey,
     required super.supabaseUrl,
+    required super.editStatsUrl,
   });
 }
 
@@ -41,6 +44,7 @@ class StagingEnv extends EnvConfig {
     required super.sentryDsn,
     required super.supabaseKey,
     required super.supabaseUrl,
+    required super.editStatsUrl,
   });
 }
 
@@ -52,6 +56,7 @@ const _prodEnv = ProdEnv(
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
   sentryDsn: String.fromEnvironment('SENTRY_DSN'),
+  editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
 const _stagingEnv = StagingEnv(
@@ -62,6 +67,7 @@ const _stagingEnv = StagingEnv(
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
   sentryDsn: String.fromEnvironment('SENTRY_DSN'),
+  editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
@@ -73,6 +79,7 @@ String get contentBaseUrl => _currentEnv.contentBaseUrl;
 String get authBaseUrl => _currentEnv.authBaseUrl;
 String get authToken => _currentEnv.authToken;
 String get sentryDsn => _currentEnv.sentryDsn;
+String get editStatsUrl => _currentEnv.editStatsUrl;
 
 class HTTPConstants {
   //END POINTS

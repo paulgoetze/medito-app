@@ -49,6 +49,21 @@ class SettingsScreen extends ConsumerWidget {
 
     final List<SettingsItem> settingsItems = [
       SettingsItem(
+        type: 'account',
+        title: StringConstants.accountTitle,
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedUserAccount,
+            color: ColorConstants.white),
+        path: 'account',
+      ),
+       SettingsItem(
+        type: 'url',
+        title: StringConstants.donateTitle,
+        icon: HugeIcon(
+            icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
+        path: 'https://donate.meditofoundation.org',
+      ),
+      SettingsItem(
         type: 'url',
         title: StringConstants.faqTitle,
         icon: HugeIcon(
@@ -69,10 +84,10 @@ class SettingsScreen extends ConsumerWidget {
                     ?.map((audio) => audio.timestamp)
                     .join(',') ??
                 '';
-            return 'https://tally.so/r/wQYKyp?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelist=$timeList';
+            return '$editStatsUrl?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelist=$timeList';
           },
-          loading: () => 'https://tally.so/r/wQYKyp?userid=$userId',
-          error: (_, __) => 'https://tally.so/r/wQYKyp?userid=$userId',
+          loading: () => '$editStatsUrl?userid=$userId',
+          error: (_, __) => '$editStatsUrl?userid=$userId',
         ),
       ),
       SettingsItem(
@@ -81,13 +96,6 @@ class SettingsScreen extends ConsumerWidget {
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedTelegram, color: ColorConstants.white),
         path: 'https://t.me/meditoapp',
-      ),
-      SettingsItem(
-        type: 'url',
-        title: StringConstants.donateTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
-        path: 'https://donate.meditofoundation.org',
       ),
       SettingsItem(
         type: 'url',
@@ -109,12 +117,19 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       SettingsItem(
-        type: 'account',
-        title: StringConstants.accountTitle,
+        type: 'url',
+        title: StringConstants.termsOfService,
         icon: HugeIcon(
-            icon: HugeIcons.solidRoundedUserAccount,
+            icon: HugeIcons.solidRoundedDocumentAttachment,
             color: ColorConstants.white),
-        path: 'account',
+        path: 'https://meditofoundation.org/terms-of-service',
+      ),
+      SettingsItem(
+        type: 'url',
+        title: StringConstants.privacyPolicy,
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedShield01, color: ColorConstants.white),
+        path: 'https://meditofoundation.org/privacy',
       ),
     ];
 
