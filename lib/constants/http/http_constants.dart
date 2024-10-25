@@ -52,7 +52,7 @@ const _prodEnv = ProdEnv(
   supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
   supabaseKey: String.fromEnvironment('SUPABASE_KEY'),
   environment: String.fromEnvironment('ENVIRONMENT'),
-  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
+  contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL_V2'),
   authBaseUrl: String.fromEnvironment('AUTH_BASE_URL'),
   authToken: String.fromEnvironment('AUTH_TOKEN'),
   sentryDsn: String.fromEnvironment('SENTRY_DSN'),
