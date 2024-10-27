@@ -54,7 +54,6 @@ jobs:
           echo "Verifying OnePub setup..."
           ls -la $PUB_CACHE/credentials/ || echo "Failed to list credentials directory"
           cat $PUB_CACHE/credentials/credentials.json || echo "Failed to read credentials file"
-          dart pub global run onepub whoami || echo "Failed to verify OnePub user"
           # Add pub credentials directly
           echo '{
             "https://onepub.dev/api/kdpxxpsdav/": {

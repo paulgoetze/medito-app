@@ -26,10 +26,18 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Setup OnePub
+        env:
+          ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
         run: |
+          echo "Setting up OnePub..."
+          mkdir -p $PUB_CACHE/credentials
           dart pub global activate onepub
-          export ONEPUB_TOKEN="${{ secrets.ONEPUB_TOKEN }}"
           dart pub global run onepub import
+          echo '{
+            "https://onepub.dev/api/kdpxxpsdav/": {
+              "token": "${{ secrets.ONEPUB_TOKEN }}"
+            }
+          }' > $PUB_CACHE/credentials/credentials.json
       
       - name: Set environment variables from GitHub Secrets
         run: |
