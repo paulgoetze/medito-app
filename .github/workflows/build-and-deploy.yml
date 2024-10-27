@@ -23,8 +23,10 @@ jobs:
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
     
-    - name: Install dependencies
-      run: flutter pub get
+    - name: Install dependencies and generate icons
+      run: |
+        flutter pub get
+        flutter pub run huge_icons:generate
     
     - name: Generate code
       run: |
