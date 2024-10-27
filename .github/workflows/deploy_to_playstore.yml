@@ -33,10 +33,6 @@ jobs:
           dart pub global activate onepub
           export ONEPUB_TOKEN="${{ secrets.ONEPUB_TOKEN }}"
           dart pub global run onepub import
-          echo "Verifying OnePub setup..."
-          ls -la $PUB_CACHE/credentials/
-          cat $PUB_CACHE/credentials/credentials.json
-          dart pub global run onepub whoami
 
       # Fixme: https://github.com/meditohq/medito-app/issues/151
       - name: Create .env files

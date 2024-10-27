@@ -43,6 +43,16 @@ jobs:
           max_attempts: 2
           command: flutter upgrade
 
+      - name: Setup OnePub
+        run: |
+          dart pub global activate onepub
+          echo "ONEPUB_TOKEN=${{ secrets.ONEPUB_TOKEN }}" >> $GITHUB_ENV
+          dart pub global run onepub import
+          echo "Verifying OnePub setup..."
+          ls -la $PUB_CACHE/credentials/
+          cat $PUB_CACHE/credentials/credentials.json || echo "No credentials file found"
+          dart pub global run onepub whoami || echo "OnePub whoami failed"
+
       - name: Flutter Pub Get
         uses: nick-invision/retry@v2
         with:
@@ -64,6 +74,9 @@ jobs:
 
       - name: Flutter clean and pub get
         run: flutter clean && flutter pub get
+
+      - name: Generate HugeIcons
+        run: flutter pub run huge_icons:generate
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
