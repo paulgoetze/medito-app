@@ -55,6 +55,12 @@ jobs:
           ls -la $PUB_CACHE/credentials/ || echo "Failed to list credentials directory"
           cat $PUB_CACHE/credentials/credentials.json || echo "Failed to read credentials file"
           dart pub global run onepub whoami || echo "Failed to verify OnePub user"
+          # Add pub credentials directly
+          echo '{
+            "https://onepub.dev/api/kdpxxpsdav/": {
+              "token": "${{ secrets.ONEPUB_TOKEN }}"
+            }
+          }' > $PUB_CACHE/credentials/credentials.json
 
       - name: Flutter Pub Get
         uses: nick-invision/retry@v2
@@ -74,9 +80,6 @@ jobs:
 
       - name: Create a dummy .staging.env file
         run: echo -e "var BASE_URL = ''; \n var SENTRY_URL = ''; \nvar INIT_TOKEN = '';" > .staging.env
-
-      - name: Generate HugeIcons
-        run: flutter pub run huge_icons:generate || (flutter pub get && flutter pub run huge_icons:generate)
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
