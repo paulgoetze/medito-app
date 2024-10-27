@@ -48,12 +48,13 @@ jobs:
           ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
         run: |
           echo "Setting up OnePub..."
+          mkdir -p $PUB_CACHE/credentials
           dart pub global activate onepub
           dart pub global run onepub import
           echo "Verifying OnePub setup..."
-          ls -la $PUB_CACHE/credentials/
-          cat $PUB_CACHE/credentials/credentials.json || echo "No credentials file found"
-          dart pub global run onepub whoami || echo "OnePub whoami failed"
+          ls -la $PUB_CACHE/credentials/ || echo "Failed to list credentials directory"
+          cat $PUB_CACHE/credentials/credentials.json || echo "Failed to read credentials file"
+          dart pub global run onepub whoami || echo "Failed to verify OnePub user"
 
       - name: Flutter Pub Get
         uses: nick-invision/retry@v2
