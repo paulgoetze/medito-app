@@ -44,9 +44,11 @@ jobs:
           command: flutter upgrade
 
       - name: Setup OnePub
+        env:
+          ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
         run: |
+          echo "Setting up OnePub..."
           dart pub global activate onepub
-          echo "ONEPUB_TOKEN=${{ secrets.ONEPUB_TOKEN }}" >> $GITHUB_ENV
           dart pub global run onepub import
           echo "Verifying OnePub setup..."
           ls -la $PUB_CACHE/credentials/
