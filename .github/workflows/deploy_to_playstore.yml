@@ -29,12 +29,9 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Setup OnePub
-        env:
-          ONEPUB_TOKEN: "Mzc4Njo4ZTE4ZGIwYS0zNWE5LTQwMDctYjM4MS02OWJmMTJjZGVkNmU="
         run: |
-          dart pub global activate onepub
-          export ONEPUB_TOKEN="${ONEPUB_TOKEN}"
-          onepub import
+          mkdir -p $PUB_CACHE/hosted/onepub.dev/api/kdpxxpsdav
+          echo '{"hosted":"https://onepub.dev/api/kdpxxpsdav","token":"${{ secrets.ONEPUB_TOKEN }}"}' > $PUB_CACHE/hosted/onepub.dev/api/kdpxxpsdav/credentials.json
 
       # Fixme: https://github.com/meditohq/medito-app/issues/151
       - name: Create .env files
