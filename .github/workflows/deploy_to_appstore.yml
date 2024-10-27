@@ -17,25 +17,18 @@ jobs:
     runs-on: macos-latest
     environment: prod
     steps:
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
-
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
           channel: stable
 
+      - name: Add pub cache to PATH
+        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+      
       - name: Setup OnePub
         run: |
           dart pub global activate onepub
-          echo "${{ secrets.ONEPUB_TOKEN }}" | onepub token add
-
-      - run: flutter doctor -v
+          onepub token add --token "${{ secrets.ONEPUB_TOKEN }}"
 
       - name: Checkout code
         uses: actions/checkout@v2

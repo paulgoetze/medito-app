@@ -20,16 +20,18 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     steps:
-      # Set up Flutter.
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v2.12.0
         with:
           channel: stable
 
+      - name: Add pub cache to PATH
+        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+      
       - name: Setup OnePub
         run: |
           dart pub global activate onepub
-          echo "${{ secrets.ONEPUB_TOKEN }}" | onepub token add
+          onepub token add --token "${{ secrets.ONEPUB_TOKEN }}"
 
       - name: Checkout code
         uses: actions/checkout@v2

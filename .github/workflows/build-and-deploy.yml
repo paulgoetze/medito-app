@@ -12,18 +12,21 @@ jobs:
   build-and-deploy:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
-    
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
         flutter-version: ${{ env.FLUTTER_VERSION }}
         channel: 'stable'
     
+    - name: Add pub cache to PATH
+      run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+    
     - name: Setup OnePub
       run: |
         dart pub global activate onepub
-        echo "${{ secrets.ONEPUB_TOKEN }}" | onepub token add
+        onepub token add --token "${{ secrets.ONEPUB_TOKEN }}"
+    
+    - uses: actions/checkout@v4
     
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
