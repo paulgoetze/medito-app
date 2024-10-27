@@ -25,7 +25,11 @@ jobs:
         uses: subosito/flutter-action@v2.12.0
         with:
           channel: stable
-      - run: flutter doctor -v
+
+      - name: Setup OnePub
+        run: |
+          dart pub global activate onepub
+          echo "${{ secrets.ONEPUB_TOKEN }}" | onepub token add
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -45,9 +49,12 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
       - name: Get dependencies and generate icons
-        run: |
-          flutter pub get
-          flutter pub run huge_icons:generate
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: flutter pub get && flutter pub run huge_icons:generate
+          retry_wait_seconds: 10
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs

@@ -20,13 +20,21 @@ jobs:
         flutter-version: ${{ env.FLUTTER_VERSION }}
         channel: 'stable'
     
+    - name: Setup OnePub
+      run: |
+        dart pub global activate onepub
+        echo "${{ secrets.ONEPUB_TOKEN }}" | onepub token add
+    
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
     
     - name: Install dependencies and generate icons
-      run: |
-        flutter pub get
-        flutter pub run huge_icons:generate
+      uses: nick-invision/retry@v2
+      with:
+        timeout_minutes: 5
+        max_attempts: 3
+        command: flutter pub get && flutter pub run huge_icons:generate
+        retry_wait_seconds: 10
     
     - name: Generate code
       run: |
