@@ -22,8 +22,13 @@ jobs:
     
     - name: Setup OnePub
       run: |
-        mkdir -p $PUB_CACHE/hosted/onepub.dev/api/kdpxxpsdav
-        echo '{"hosted":"https://onepub.dev/api/kdpxxpsdav","token":"${{ secrets.ONEPUB_TOKEN }}"}' > $PUB_CACHE/hosted/onepub.dev/api/kdpxxpsdav/credentials.json
+        mkdir -p $PUB_CACHE/credentials
+        echo '{
+          "https://onepub.dev/api/kdpxxpsdav/": {
+            "token": "${{ secrets.ONEPUB_TOKEN }}"
+          }
+        }' > $PUB_CACHE/credentials/credentials.json
+        cat $PUB_CACHE/credentials/credentials.json
     
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
