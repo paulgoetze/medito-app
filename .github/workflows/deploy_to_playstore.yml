@@ -32,7 +32,7 @@ jobs:
         run: |
           dart pub global activate onepub
           export ONEPUB_TOKEN="${{ secrets.ONEPUB_TOKEN }}"
-          dart pub global run onepub login
+          dart pub global run onepub import
 
       # Fixme: https://github.com/meditohq/medito-app/issues/151
       - name: Create .env files

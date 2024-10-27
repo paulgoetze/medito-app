@@ -24,7 +24,7 @@ jobs:
       run: |
         dart pub global activate onepub
         export ONEPUB_TOKEN="${{ secrets.ONEPUB_TOKEN }}"
-        dart pub global run onepub login
+        dart pub global run onepub import
     
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
