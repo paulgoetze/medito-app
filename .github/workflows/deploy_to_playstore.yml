@@ -32,7 +32,7 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
-
+      
       # Fixme: https://github.com/meditohq/medito-app/issues/151
       - name: Create .env files
         run: sh ./.github/scripts/create_env_files.sh

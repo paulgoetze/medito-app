@@ -22,13 +22,13 @@ jobs:
         with:
           channel: stable
       
-      - name: Setup OnePub
-        run: |
-          dart pub global activate onepub
-          onepub token add --token "${{ secrets.ONEPUB_TOKEN }}" --hosted-url https://onepub.dev/api/kdpxxpsdav/
-
       - name: Checkout code
         uses: actions/checkout@v2
+      
+      - name: Setup OnePub credentials
+        run: |
+          mkdir -p $PUB_CACHE/credentials
+          echo '{"https://onepub.dev/api/kdpxxpsdav/": {"token": "${{ secrets.ONEPUB_TOKEN }}"}}' > $PUB_CACHE/credentials/credentials.json
 
       - name: Set environment variables from GitHub Secrets
         run: |
