@@ -24,7 +24,7 @@ jobs:
     - name: Setup OnePub
       run: |
         dart pub global activate onepub
-        onepub token add --token "${{ secrets.ONEPUB_TOKEN }}"
+        onepub token add --token "${{ secrets.ONEPUB_TOKEN }}" --hosted-url https://onepub.dev/api/kdpxxpsdav/
     
     - uses: actions/checkout@v4
     
