@@ -4,7 +4,6 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/mock/mock_stats_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:flutter/material.dart';
@@ -90,10 +89,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: Center(child: Text('Error: $err')),
       ),
       data: (localAllStats) {
-        var streak = MockStats.enabled ? MockStats.getMockedDays().length : localAllStats.streakCurrent;
-        var daysMeditated = MockStats.enabled 
-            ? MockStats.getMockedDays().map((d) => d.toIso8601String().split('T')[0]).toList()
-            : _getDaysMeditated(localAllStats.audioCompleted);
+        var streak = localAllStats.streakCurrent;
+        var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
         var lastFiveDays = List.generate(
           5,
           (index) => DateTime.now().subtract(Duration(days: index)),
@@ -217,6 +214,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         DateTime day = lastFiveDays[index];
         var isMeditated =
             daysMeditated.contains(day.toIso8601String().split('T')[0]);
+        
+        var isConsecutive = isMeditated && 
+            (index > 0 && daysMeditated.contains(lastFiveDays[index - 1].toIso8601String().split('T')[0]) ||
+             index < dayLetters.length - 1 && daysMeditated.contains(lastFiveDays[index + 1].toIso8601String().split('T')[0]));
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
@@ -235,15 +237,26 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 ),
               ),
               const SizedBox(height: 4),
-              isMeditated
-                  ? HugeIcon(
-                      size: 32,
-                      icon: HugeIcons.solidSharpCheckmarkCircle02,
-                      color: ColorConstants.lightPurple)
-                  : HugeIcon(
-                      size: 32,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (isConsecutive)
+                    HugeIcon(
+                      size: 36,
                       icon: HugeIcons.solidSharpCircle,
-                      color: ColorConstants.moon),
+                      color: Colors.white,
+                    ),
+                  isMeditated
+                      ? HugeIcon(
+                          size: 32,
+                          icon: HugeIcons.solidSharpCheckmarkCircle02,
+                          color: ColorConstants.lightPurple)
+                      : HugeIcon(
+                          size: 32,
+                          icon: HugeIcons.solidSharpCircle,
+                          color: ColorConstants.moon),
+                ],
+              ),
             ],
           ),
         );
