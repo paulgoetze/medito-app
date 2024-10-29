@@ -4,12 +4,13 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/mock/mock_stats_provider.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/donation_widget.dart';
-import '../../../providers/stats_provider.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
   final TrackModel trackModel;
@@ -89,8 +90,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: Center(child: Text('Error: $err')),
       ),
       data: (localAllStats) {
-        var streak = localAllStats.streakCurrent;
-        var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
+        var streak = MockStats.enabled ? MockStats.getMockedDays().length : localAllStats.streakCurrent;
+        var daysMeditated = MockStats.enabled 
+            ? MockStats.getMockedDays().map((d) => d.toIso8601String().split('T')[0]).toList()
+            : _getDaysMeditated(localAllStats.audioCompleted);
         var lastFiveDays = List.generate(
           5,
           (index) => DateTime.now().subtract(Duration(days: index)),
