@@ -59,6 +59,10 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget> with Si
 
   @override
   Widget build(BuildContext context) {
+    if (widget.announcement.text == null) {
+      return const SizedBox.shrink();
+    }
+
     var bgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
 

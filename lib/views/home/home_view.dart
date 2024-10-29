@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/meditation/download_track_provider.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,7 +93,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       loading: () => Container(),
       error: (err, stack) => Container(),
       data: (announcement) {
-        if (announcement == null) {
+        if (announcement == null || announcement.text == null || announcement.text == '') {
           return Container();
         }
 
