@@ -23,6 +23,7 @@ jobs:
     - name: Setup OnePub
       env:
         ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
+        PUB_CACHE: ${{ github.workspace }}/.pub-cache
       run: |
         echo "Setting up OnePub..."
         mkdir -p $PUB_CACHE/credentials
