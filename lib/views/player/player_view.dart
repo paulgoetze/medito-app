@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
+import '../../utils/health_kit_manager.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
   const PlayerView({
@@ -32,13 +33,22 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final currentlyPlayingTrack = ref.watch(playerProvider);
-      if (currentlyPlayingTrack?.hasBackgroundSound ?? false) {
-        ref
-            .read(backgroundSoundsNotifierProvider.notifier)
-            .playBackgroundSoundFromPref();
-      }
+      _initializePlayer();
     });
+  }
+
+  Future<void> _initializePlayer() async {
+    final currentlyPlayingTrack = ref.watch(playerProvider);
+    if (currentlyPlayingTrack?.hasBackgroundSound ?? false) {
+      ref
+          .read(backgroundSoundsNotifierProvider.notifier)
+          .playBackgroundSoundFromPref();
+    }
+
+    var healthKitManager = HealthKitManager();
+    if (await healthKitManager.isHealthSyncPermitted() != true) {
+      await healthKitManager.requestAuthorization();
+    }
   }
 
   @override
