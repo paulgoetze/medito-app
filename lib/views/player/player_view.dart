@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
@@ -233,14 +234,18 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         _resetState();
         final currentlyPlayingTrack = ref.read(playerProvider);
         if (currentlyPlayingTrack != null && mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EndScreenView(
-                trackModel: currentlyPlayingTrack,
+          Future.delayed(const Duration(milliseconds: 500), () {
+            ref.read(statsProvider.notifier).refresh();
+            
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EndScreenView(
+                  trackModel: currentlyPlayingTrack,
+                ),
               ),
-            ),
-          );
+            );
+          });
 
           _endScreenOpened = true;
         }

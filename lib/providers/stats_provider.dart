@@ -35,7 +35,6 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   }
 
   Future<void> refresh() async {
-    state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _fetchStats());
   }
 }

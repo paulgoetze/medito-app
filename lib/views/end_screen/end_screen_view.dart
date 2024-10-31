@@ -22,11 +22,18 @@ class EndScreenView extends ConsumerStatefulWidget {
 }
 
 class _EndScreenViewState extends ConsumerState<EndScreenView> {
-
   @override
   void initState() {
     super.initState();
-    ref.read(statsProvider.notifier).refresh();
+    _loadStats();
+  }
+
+  void _loadStats() {
+    Future.delayed(const Duration(seconds: 1), () {
+      ref.read(statsProvider.notifier).refresh().then((_) {
+        ref.invalidate(statsProvider);
+      });
+    });
   }
 
   @override
