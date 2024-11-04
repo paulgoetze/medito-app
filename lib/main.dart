@@ -163,8 +163,16 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   Future<void> _checkInitialConnectivity() async {
+    var isFirstEvent = true;
+
     _connectivityListener =
         InternetConnection().onStatusChange.listen((InternetStatus status) {
+      
+      if (isFirstEvent) {
+        isFirstEvent = false;
+        return;
+      }
+
       switch (status) {
         case InternetStatus.connected:
           _hideNoConnectionSnackBar();
@@ -175,7 +183,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           break;
       }
     });
-  
+
     return;
   }
 
@@ -202,7 +210,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           ),
         );
     }
-  
+
     return;
   }
 
