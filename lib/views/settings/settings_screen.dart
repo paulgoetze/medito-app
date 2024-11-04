@@ -80,7 +80,9 @@ class SettingsScreen extends ConsumerWidget {
         ),
         path: statsAsyncValue.when(
           data: (stats) {
-            return '$editStatsUrl?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelistened=${stats.totalTimeListened}';
+            final totalTimeListenedInMinutes = (stats.totalTimeListened / 60000).round();
+            
+            return '$editStatsUrl?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelistened=$totalTimeListenedInMinutes';
           },
           loading: () => '$editStatsUrl?userid=$userId',
           error: (_, __) => '$editStatsUrl?userid=$userId',
