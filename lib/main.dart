@@ -30,8 +30,14 @@ import 'package:medito/providers/notification/reminder_provider.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
+bool _hasInitialized = false;
 
 void main() async {
+  if (_hasInitialized) {
+    return;
+  }
+  _hasInitialized = true;
+
   WidgetsFlutterBinding.ensureInitialized();
   var appLinks = AppLinks();
 
@@ -46,7 +52,7 @@ void main() async {
   });
 
   await initializeApp();
-  _runAppWithSentry();
+  await _runApp();
 }
 
 Future<void> initializeApp() async {
@@ -72,22 +78,14 @@ Future<void> initializeAudioService() async {
   }
 }
 
-Future<void> _runAppWithSentry() async {
+Future<void> _runApp() async {
   var prefs = await initializeSharedPreferences();
-  SentryFlutter.init(
-    (options) {
-      options.attachScreenshot = true;
-      options.environment = environment;
-      options.dsn = sentryDsn;
-      options.tracesSampleRate = 1.0;
-    },
-    appRunner: () => runApp(
-      ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
-        child: const ParentWidget(),
-      ),
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const ParentWidget(),
     ),
   );
 }
@@ -104,7 +102,6 @@ class ParentWidget extends ConsumerStatefulWidget {
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
   StreamSubscription? _sub;
-  late final StreamSubscription<InternetStatus> _connectivityListener;
   late DioHeaderService dioHeaderService;
 
   @override
@@ -113,11 +110,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     _initDeepLinkListener();
-    _initializeDioHeaderService().then(
-      (_) {
-        _checkInitialConnectivity();
-      },
-    );
+    _initializeDioHeaderService();
   }
 
   Future<void> _initializeDioHeaderService() async {
@@ -162,65 +155,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     ));
   }
 
-  Future<void> _checkInitialConnectivity() async {
-    var isFirstEvent = true;
-
-    _connectivityListener =
-        InternetConnection().onStatusChange.listen((InternetStatus status) {
-      
-      if (isFirstEvent) {
-        isFirstEvent = false;
-        return;
-      }
-
-      switch (status) {
-        case InternetStatus.connected:
-          _hideNoConnectionSnackBar();
-          StatsManager().sync().then((_) => ref.invalidate(statsProvider));
-          break;
-        case InternetStatus.disconnected:
-          _showNoConnectionSnackBar();
-          break;
-      }
-    });
-
-    return;
-  }
-
-  void _hideNoConnectionSnackBar() {
-    scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
-  }
-
-  void _showNoConnectionSnackBar() {
-    var currentState = scaffoldMessengerKey.currentState;
-    if (currentState?.mounted ?? false) {
-      currentState!
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: const Text(StringConstants.noConnectionMessage),
-            duration: const Duration(days: 365),
-            action: SnackBarAction(
-              label: StringConstants.goToDownloads,
-              onPressed: () {
-                currentState.hideCurrentSnackBar();
-                _navigateToDownloads(context);
-              },
-            ),
-          ),
-        );
-    }
-
-    return;
-  }
-
-  void _navigateToDownloads(BuildContext context) {
-    handleNavigation(TypeConstants.flow, ['downloads'], context, ref: ref);
-  }
-
   @override
   void dispose() {
-    _connectivityListener.cancel();
     _sub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -234,7 +170,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       navigatorKey: navigatorKey,
       theme: appTheme(context),
       title: ParentWidget._title,
-      home: const SplashView(),
+      home: SplashView(),
     );
   }
 
