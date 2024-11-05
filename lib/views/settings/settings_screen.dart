@@ -35,6 +35,29 @@ TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
       : null;
 }
 
+final userIdProvider = FutureProvider<String>((ref) async {
+  final authRepository = ref.watch(authRepositoryProvider);
+  final userId = await authRepository.getClientIdFromSharedPreference();
+
+  return userId ?? '';
+});
+
+class SettingsItem {
+  final String type;
+  final String title;
+  final Widget icon;
+  final String path;
+  final VoidCallback? onNavigationComplete;
+
+  const SettingsItem({
+    required this.type,
+    required this.title,
+    required this.icon,
+    required this.path,
+    this.onNavigationComplete,
+  });
+}
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
@@ -42,10 +65,8 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authRepository = ref.watch(authRepositoryProvider);
-    final userId = authRepository.currentUser?.id ?? '';
+    final clientIdSync = ref.watch(userIdProvider);
     final deviceInfoAsyncValue = ref.watch(deviceAndAppInfoProvider);
-    final statsAsyncValue = ref.watch(statsProvider);
 
     final List<SettingsItem> settingsItems = [
       SettingsItem(
@@ -56,7 +77,7 @@ class SettingsScreen extends ConsumerWidget {
             color: ColorConstants.white),
         path: 'account',
       ),
-       SettingsItem(
+      SettingsItem(
         type: 'url',
         title: StringConstants.donateTitle,
         icon: HugeIcon(
@@ -78,15 +99,31 @@ class SettingsScreen extends ConsumerWidget {
           icon: HugeIcons.solidRoundedQuestion,
           color: ColorConstants.white,
         ),
-        path: statsAsyncValue.when(
-          data: (stats) {
-            final totalTimeListenedInMinutes = (stats.totalTimeListened / 60000).round();
+        path: clientIdSync.when(
+          data: (clientId) {
+            final stats = ref.watch(statsProvider.select((value) => value.whenData((stats) => {
+              'streakCurrent': stats.streakCurrent,
+              'streakLongest': stats.streakLongest,
+              'totalTracksCompleted': stats.totalTracksCompleted,
+              'totalTimeListened': stats.totalTimeListened,
+            })));
             
-            return '$editStatsUrl?userid=$userId&streakcurrent=${stats.streakCurrent}&streaklongest=${stats.streakLongest}&trackscompleted=${stats.totalTracksCompleted}&timelistened=$totalTimeListenedInMinutes';
+            return stats.when(
+              data: (data) {
+                final totalTimeListenedInMinutes = (data['totalTimeListened']! / 60000).round();
+                
+                return '$editStatsUrl?clientid=$clientId&streakcurrent=${data['streakCurrent']}&streaklongest=${data['streakLongest']}&trackscompleted=${data['totalTracksCompleted']}&timelistened=$totalTimeListenedInMinutes';
+              },
+              loading: () => '$editStatsUrl?userid=$clientId',
+              error: (_, __) => '$editStatsUrl?userid=$clientId',
+            );
           },
-          loading: () => '$editStatsUrl?userid=$userId',
-          error: (_, __) => '$editStatsUrl?userid=$userId',
+          loading: () => editStatsUrl,
+          error: (_, __) => editStatsUrl,
         ),
+        onNavigationComplete: () {
+          ref.read(statsProvider.notifier).sync();
+        },
       ),
       SettingsItem(
         type: 'url',
@@ -100,18 +137,22 @@ class SettingsScreen extends ConsumerWidget {
         title: StringConstants.contactUsTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedMessage01, color: ColorConstants.white),
-        path: deviceInfoAsyncValue.when(
-          data: (deviceInfo) {
-            final platform = Uri.encodeComponent(deviceInfo.platform);
-            final language = Uri.encodeComponent(deviceInfo.languageCode);
-            final model = Uri.encodeComponent(deviceInfo.model);
-            final appVersion = Uri.encodeComponent(deviceInfo.appVersion);
-            final os = Uri.encodeComponent(deviceInfo.os);
+        path: clientIdSync.when(
+          data: (userId) => deviceInfoAsyncValue.when(
+            data: (deviceInfo) {
+              final platform = Uri.encodeComponent(deviceInfo.platform);
+              final language = Uri.encodeComponent(deviceInfo.languageCode);
+              final model = Uri.encodeComponent(deviceInfo.model);
+              final appVersion = Uri.encodeComponent(deviceInfo.appVersion);
+              final os = Uri.encodeComponent(deviceInfo.os);
 
-            return 'https://tally.so/r/wLGBaO?userId=$userId&platform=$platform&language=$language&model=$model&appVersion=$appVersion&os=$os';
-          },
-          loading: () => 'https://tally.so/r/wLGBaO?userId=$userId',
-          error: (_, __) => 'https://tally.so/r/wLGBaO?userId=$userId',
+              return 'https://tally.so/r/wLGBaO?userId=$userId&platform=$platform&language=$language&model=$model&appVersion=$appVersion&os=$os';
+            },
+            loading: () => 'https://tally.so/r/wLGBaO?userId=$userId',
+            error: (_, __) => 'https://tally.so/r/wLGBaO?userId=$userId',
+          ),
+          loading: () => 'https://tally.so/r/wLGBaO',
+          error: (_, __) => 'https://tally.so/r/wLGBaO',
         ),
       ),
       SettingsItem(
@@ -247,6 +288,7 @@ class SettingsScreen extends ConsumerWidget {
       [item.path.toString().getIdFromPath(), item.path],
       context,
       ref: ref,
+      onNavigationComplete: item.onNavigationComplete,
     );
   }
 
@@ -322,18 +364,4 @@ class SettingsScreen extends ConsumerWidget {
       builder: (context) => const DebugBottomSheetWidget(),
     );
   }
-}
-
-class SettingsItem {
-  final String type;
-  final String title;
-  final Widget icon;
-  final String path;
-
-  const SettingsItem({
-    required this.type,
-    required this.title,
-    required this.icon,
-    required this.path,
-  });
 }

@@ -26,6 +26,7 @@ Future<void> handleNavigation(
   List<String?> ids,
   BuildContext context, {
   WidgetRef? ref,
+  VoidCallback? onNavigationComplete,
 }) async {
   ids.removeWhere((element) => element == null);
 
@@ -41,7 +42,19 @@ Future<void> handleNavigation(
             : ids.first!;
     await _pushRoute(PackView(id: packId), ref);
   } else if (type == TypeConstants.url || type == TypeConstants.link) {
-    await launchURLInBrowser(ids.last ?? StringConstants.meditoUrl);
+    final url = ids.last ?? StringConstants.meditoUrl;
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => _URLLauncherScreen(url: uri),
+        ),
+      );
+      if (result == true) {
+        onNavigationComplete?.call();
+      }
+    }
   } else if (type.contains('settings')) {
     await _pushRoute(const SettingsScreen(), ref);
   } else if (type == TypeConstants.email) {
@@ -109,5 +122,48 @@ Future<void> launchEmailSubmission(String email, {String? body}) async {
     await launchUrl(uri);
   } else {
     throw 'Could not launch $uri';
+  }
+}
+
+// This allows running a callback onPop
+class _URLLauncherScreen extends StatefulWidget {
+  final Uri url;
+
+  const _URLLauncherScreen({required this.url});
+
+  @override
+  State<_URLLauncherScreen> createState() => _URLLauncherScreenState();
+}
+
+class _URLLauncherScreenState extends State<_URLLauncherScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _launchUrl();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Navigator.pop(context, true);
+    }
+  }
+
+  Future<void> _launchUrl() async {
+    await launchUrl(widget.url, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Colors.transparent,
+    );
   }
 }
