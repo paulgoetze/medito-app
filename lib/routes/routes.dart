@@ -6,7 +6,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/path/journal_entry_view.dart';

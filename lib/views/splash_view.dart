@@ -1,5 +1,4 @@
 import 'package:medito/constants/constants.dart';
-import 'package:medito/main.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/stats_manager.dart';
