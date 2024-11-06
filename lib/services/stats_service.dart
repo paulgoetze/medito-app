@@ -22,6 +22,10 @@ class StatsService {
     LocalAllStats localStats,
   ) async {
     var allStats = localStats.toAllStats();
+    var now = DateTime.now().millisecondsSinceEpoch;
+    if ((now - localStats.updated) < 5000) {
+      return;
+    }
     try {
       await _dioApiService.postRequest(
         HTTPConstants.allStats,
