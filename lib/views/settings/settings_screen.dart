@@ -122,7 +122,7 @@ class SettingsScreen extends ConsumerWidget {
           error: (_, __) => editStatsUrl,
         ),
         onNavigationComplete: () {
-          ref.read(statsProvider.notifier).sync();
+          ref.read(statsProvider.notifier).refresh();
         },
       ),
       SettingsItem(
